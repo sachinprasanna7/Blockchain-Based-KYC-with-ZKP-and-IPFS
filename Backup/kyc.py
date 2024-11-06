@@ -26,7 +26,7 @@ def initContract():
     return w3.eth.contract(address=os.getenv("KYC_ADDRESS"), abi=abi)
 
 
-def convertDataToJSON(first_name, last_name, dob, age, email, nationality, occupation, zkp_proof):
+def convertDataToJSON(first_name, last_name, dob, age, zkp_commitment):
     data = {
         "pinataOptions": {"cidVersion": 1},
         "pinataContent": {
@@ -35,10 +35,7 @@ def convertDataToJSON(first_name, last_name, dob, age, email, nationality, occup
             "last_name":  last_name,
             "date of birth": dob,
             "age": age,
-            "email": email,
-            "nationality": nationality,
-            "occupation": occupation, 
-            "zkp_proof": zkp_proof
+            "zkp_proof": zkp_commitment
         },  
     }
     return json.dumps(data)

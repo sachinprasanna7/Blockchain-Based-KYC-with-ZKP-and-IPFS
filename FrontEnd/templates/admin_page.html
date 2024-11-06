@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Include Bootstrap for styling -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .navbar-custom {
+            background-color: #f7c600;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 30px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            background-color: #f7c600;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Modal Body Styling */
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 400px; /* Restricts the height of the modal body */
+        }
+
+        .client-info {
+            line-height: 1.8;
+        }
+
+        .client-info p {
+            margin-bottom: 10px;
+            word-wrap: break-word; /* Prevents overflow of long text */
+        }
+
+        .modal-dialog.modal-lg {
+            max-width: 800px; /* Increase modal width for better view */
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold" href="#" style="color: black;">IT465 Project - Know Your Customer</a>
+            <div class="ml-auto">
+                <button class="btn btn-dark" onclick="window.location.href = '/'">Back</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+
+        <h2>Admin Dashboard</h2>
+
+        <!-- Check KYC Validity -->
+        <h4>Check KYC Validity</h4>
+        <form id="checkValidityForm">
+            <div class="form-group">
+                <label for="user_id">Enter User ID:</label>
+                <input type="text" id="user_id" name="user_id" class="form-control" required>
+            </div>
+            <button type="submit" name="check_validity" class="btn btn-custom btn-block">Check</button>
+        </form>
+
+        <!-- Get Client Count -->
+        <h4 class="mt-5">Get Client Count</h4>
+        <form id="getClientCountForm">
+            <button type="submit" name="get_client_count" class="btn btn-custom btn-block">Get Client Count</button>
+        </form>
+
+        <!-- Client Database Information -->
+        <h4 class="mt-5">Client Database Information</h4>
+        <form id="getClientInfoForm">
+            <div class="form-group">
+                <label for="user_id_info">Enter User ID:</label>
+                <input type="text" id="user_id_info" name="user_id" class="form-control" required>
+            </div>
+            <button type="submit" name="get_client_info" class="btn btn-custom btn-block">Get Info</button>
+        </form>
+    </div>
+
+    <!-- Modal for KYC Validity -->
+    <div class="modal" id="validityModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">KYC Validity</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="validityMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Client Count -->
+    <div class="modal" id="clientCountModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Client Count</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="clientCountMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Client Information -->
+    <div class="modal" id="clientInfoModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Client Information</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="client-info">
+                        <p><strong>User ID:</strong> <span id="clientUserId"></span></p>
+                        <p><strong>Report URI:</strong> <span id="clientReportUri"></span></p>
+                        <p><strong>Used:</strong> <span id="clientUsed"></span></p>
+                        <p><strong>Start Date:</strong> <span id="clientEndDate"></span></p>
+                        <p><strong>ZKP Proof:</strong> <span id="clientZkpProof"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submissions via AJAX
+        $("#checkValidityForm").on("submit", function (event) {
+            event.preventDefault();
+            const userId = $("#user_id").val();
+
+            $.post("/admin", { user_id: userId, check_validity: true }, function (response) {
+                $("#validityMessage").text(response.validity_message);
+                $("#validityModal").modal("show");
+            });
+        });
+
+        $("#getClientCountForm").on("submit", function (event) {
+            event.preventDefault();
+
+            $.post("/admin", { get_client_count: true }, function (response) {
+                $("#clientCountMessage").text("Total Clients: " + response.client_count);
+                $("#clientCountModal").modal("show");
+            });
+        });
+
+        $("#getClientInfoForm").on("submit", function (event) {
+            event.preventDefault();
+            const userId = $("#user_id_info").val();
+
+            $.post("/admin", { user_id: userId, get_client_info: true }, function (response) {
+                $("#clientUserId").text(response.user_id);
+                $("#clientReportUri").text(response.report_uri);
+                $("#clientUsed").text(response.used);
+                $("#clientEndDate").text(new Date(response.end_date * 1000).toLocaleString());
+                $("#clientZkpProof").text(response.zkp_proof);
+                $("#clientInfoModal").modal("show");
+            });
+        });
+    </script>
+
+</body>
+
+</html>

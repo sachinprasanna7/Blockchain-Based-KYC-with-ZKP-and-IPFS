@@ -1,0 +1,28 @@
+const kyc = await KYC.deployed();
+
+const admin = await kyc.admin();
+console.log(admin);
+
+const userID = "0xD392cD8a846aBA7345744e5a0756F0eAb10F5EB6";  // Replace with the actual address
+const reportURI = "https://example.com/kyc_report.pdf";  // Example URI
+await kyc.registerKYC(userID, reportURI, { from: admin });
+
+const validity = await kyc.checkValidity(userID);
+console.log(validity);
+
+const clientCount = await kyc.getclientCount();
+console.log(clientCount.toString());  
+
+const userID = "0xD392cD8a846aBA7345744e5a0756F0eAb10F5EB6"
+const clientInfo = await kyc.Clientdatabase(userID);
+console.log(clientInfo)
+
+
+
+const user_1 = "0x15397f42d97bA469C252389386E6bF4F3dD65CAB"
+const proof_1 = await kyc.verifyAge(user_1);
+console.log(proof_1)
+
+const user_2 = "0x1B392d016F28bC642E75536a24E857C4dD0E1128"
+const proof_2 = await kyc.verifyAge(user_2);
+console.log(proof_2)

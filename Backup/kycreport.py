@@ -18,19 +18,15 @@ def createkycReport():
     first_name = input("First Name: ")
     last_name = input("Last Name: ")
     dob = input("Date of birth dd/mm/yyyy: ")
-    age = calculate_age(dob)
-    email = input("Email: ")
-    nationality = input("Nationality: ")
-    occupation = input("Occupation: ")
-
     user_id = input("User ID: ")
+    age = calculate_age(dob)
 
     print("Age is ", age)
 
     zkp_proof = zkp.generate_proof(age)
     print("ZKP Proof:", zkp_proof)
     
-    json_data = convertDataToJSON(first_name, last_name, dob, age, email, nationality, occupation, zkp_proof)
+    json_data = convertDataToJSON(first_name, last_name, dob, age, zkp_proof)
     report_uri = pinJSONtoIPFS(json_data)
 
     return user_id, report_uri, zkp_proof
@@ -68,7 +64,7 @@ def main():
     if sys.argv[1] == "update":
         user_id, report_uri, zkp_proof= createkycReport()
 
-        receipt = kycupdate(user_id, report_uri)
+        receipt = kycupdate(user_id, report_uri, zkp_proof)
 
         pprint(receipt)
         print("Report IPFS Hash:", report_uri)
