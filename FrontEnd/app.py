@@ -21,6 +21,11 @@ def calculate_age(dob):
     age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
     return age
 
+# Route for the landing page
+@app.route("/landing", methods=["GET"])
+def landing():
+    return render_template("landing_page.html")
+
 # Route for KYC Registration
 @app.route("/register", methods=["POST"])
 def kyc_register():
@@ -81,13 +86,12 @@ def kyc_update():
     flash("KYC Report Updated Successfully", "success")
     return render_template("kyc_updation_result.html", receipt=receipt, report_uri=report_uri, user_id=user_id, zkp_proof=zkp_proof)
 
-
 # Route for the form
 @app.route("/", methods=["GET"])
 def form():
     return render_template("kyc_form.html")
 
-
+# Route for Admin Login
 @app.route("/admin_login", methods=["POST"])
 def admin_login():
     password = request.form.get("password")
@@ -95,13 +99,10 @@ def admin_login():
 
     # Check if the password is correct for the role
     if role == "admin" and password == "admin123":
-        # Redirect to the admin page if password is correct
         return redirect(url_for("admin_page"))
-    elif role == "bank" and password == "bank123":  # Add a password check for bank if needed
-        # Handle bank page access or redirect to a placeholder
-        return redirect(url_for("bank_page"))  # Assume you have a bank_page route
+    elif role == "bank" and password == "bank123":
+        return redirect(url_for("bank_page"))
 
-    # If password is incorrect, reload form with error message
     flash("Incorrect password. Please try again.", "danger")
     return redirect(url_for("form"))
 
@@ -110,7 +111,6 @@ def admin_login():
 def admin_page():
     return render_template("admin_page.html")
 
-
 # Route for the admin page with form data
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -118,17 +118,14 @@ def admin():
         user_id = request.form.get("user_id")
         
         if "check_validity" in request.form:
-            # Check KYC validity
             validity_message = kyccontract.functions.checkValidity(user_id).call()
             return jsonify({"validity_message": validity_message})
 
         elif "get_client_count" in request.form:
-            # Get the client count
             client_count = kyccontract.functions.getClientCount().call()
             return jsonify({"client_count": client_count})
 
         elif "get_client_info" in request.form:
-            # Get client info
             client_info = kyccontract.functions.Clientdatabase(user_id).call()
             return jsonify({
                 "user_id": client_info[0],
@@ -140,12 +137,10 @@ def admin():
 
     return render_template("admin_page.html")
 
-
 # Route for the bank page (optional, if needed)
 @app.route("/bank_page")
 def bank_page():
     return render_template("bank_page.html")
-
 
 @app.route("/bank", methods=["GET", "POST"])
 def bank():
@@ -157,7 +152,6 @@ def bank():
             return jsonify({"age_verification": age_verification})
 
     return render_template("bank_page.html")
-
 
 # Run the app
 if __name__ == "__main__":
